@@ -39,9 +39,6 @@ public class UserService {
         masterPerson.setEmail(newUser.email());
 
         User user = new User();
-        if (newUser.userRole() != null) {
-            user.setUserRole(newUser.userRole());
-        }
         user.setEncryptedPassword(newUser.encryptedPassword());
         user.setMasterPerson(masterPerson);
         masterPerson.setUser(user);

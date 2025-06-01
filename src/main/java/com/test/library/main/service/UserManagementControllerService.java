@@ -44,7 +44,7 @@ public class UserManagementControllerService {
     }
 
     @Transactional
-    public User registerNewUser(NewUserDto newUser) throws BaseApplicationException  {
+    public User registerNewUser(NewUserDto newUser) throws BaseApplicationException {
         return newUserService.registerNewUser(newUser);
     }
 
