@@ -89,7 +89,7 @@ public class UserSessionService {
         userSessionRepo.delete(session);
     }
 
-    public User findPersonByUserSession() throws BaseApplicationException {
+    public User findUserFromSession() throws BaseApplicationException {
         UUID userSession = sessionData.getUserSession();
         if (userSession == null) {
             throw new UserSessionIdRequiredException();
@@ -103,5 +103,4 @@ public class UserSessionService {
         }
         return session.getUser();
     }
-
 }

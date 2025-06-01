@@ -33,13 +33,13 @@ public class BookControllerService {
 
     @Transactional
     public BookDto markSelfCheckOut(UUID bookId, LocalDate expectedReturnDate) throws BaseApplicationException {
-        User user = userSessionService.findPersonByUserSession();
+        User user = userSessionService.findUserFromSession();
         return markCheckOut(bookId, user, expectedReturnDate);
     }
 
     @Transactional
     public BookDto markCheckOut(UUID bookId, CheckOutWithUserSessionDto request) throws BaseApplicationException {
-        User user = userSessionService.findPersonByUserSession();
+        User user = userSessionService.findUserFromSession();
         verifyAsAdmin(user);
         User checkoutUser = userService.findByIdWithCheckOutsFilteredByUnreturnedStatus(request.userId())
                 .orElseThrow(UserNotFoundException::new);

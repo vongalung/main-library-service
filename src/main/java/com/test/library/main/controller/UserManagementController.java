@@ -4,7 +4,9 @@ import com.test.library.main.dto.request.LoginRequestDto;
 import com.test.library.main.dto.request.NewUserDto;
 import com.test.library.main.dto.response.CommonResponseDto;
 import com.test.library.main.dto.response.LoginResponseDto;
+import com.test.library.main.dto.response.UserDto;
 import com.test.library.main.exception.BaseApplicationException;
+import com.test.library.main.model.User;
 import com.test.library.main.service.UserManagementControllerService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -14,35 +16,33 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
-@RequestMapping("/user/management")
+@RequestMapping("/user")
 @RequiredArgsConstructor
 @Validated
 @Log4j2
 public class UserManagementController {
     final UserManagementControllerService userManagementControllerService;
 
-    @PostMapping
-    public CompletableFuture<Void> registerNewUser(@RequestBody @NotNull @Valid NewUserDto request)
-            throws BaseApplicationException {
-        return userManagementControllerService.registerNewUser(request)
-                .thenAccept(v -> log.info(
-                        "User={} is temporarily added, waiting for verification.", request))
-                .exceptionally(e -> {
-                    log.error("Failed user registration for request={}: {}",
-                            request, e.getMessage(), e);
-                    return null;
-                });
+    @GetMapping({"/self"})
+    public UserDto findUserSelf() {
+        return userManagementControllerService.findUserSelf();
     }
 
-    @GetMapping("/verify")
+    @GetMapping({"/{userId}"})
+    public UserDto findUser(@PathVariable @NotNull UUID userId) {
+        return userManagementControllerService.findUser(userId);
+    }
+
+    @PostMapping
     @Transactional
-    public CommonResponseDto verifyRegistration(@RequestParam @NotNull UUID verificationKey) {
-        log.debug("INCOMING REQUEST to UsrMgmt.verifyRegistration : {}", verificationKey);
-        userManagementControllerService.verifyUserRegistration(verificationKey);
-        return CommonResponseDto.generateWithMessage("User registration is successfully verified.");
+    public CommonResponseDto registerNewUser(@RequestBody @NotNull @Valid NewUserDto request)
+            throws BaseApplicationException {
+        log.debug("INCOMING REQUEST to UsrMgmt.registerNewUser : {}", request);
+        User user = userManagementControllerService.registerNewUser(request);
+        return CommonResponseDto.generateWithMessage(
+                "User registration is successfully verified for user=" + user.getMasterPerson().getEmail());
     }
 
     @PostMapping("/login")
@@ -54,7 +54,7 @@ public class UserManagementController {
 
     @PostMapping("/logout")
     @Transactional
-    public CommonResponseDto logout(@RequestBody @NotNull @Valid LoginRequestDto request)
+    public CommonResponseDto logout()
             throws BaseApplicationException{
         userManagementControllerService.logout();
         return CommonResponseDto.generateWithMessage("User logged out.");

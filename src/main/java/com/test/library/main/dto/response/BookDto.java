@@ -11,5 +11,5 @@ public record BookDto (
     boolean isAvailable,
     ZonedDateTime lastUnreturnedCheckoutAt,
     ZonedDateTime expectedReturnDate,
-    UserDto currentBorrower
+    CheckOutUserDto currentBorrower
 ) { }

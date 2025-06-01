@@ -1,6 +1,5 @@
 package com.test.library.main.config;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
@@ -22,6 +21,4 @@ public class AppConfig {
     @NotNull
     @PositiveOrZero
     private Long keepSessionAliveHours;
-    @NotBlank
-    private String applicationBaseUrl;
 }
