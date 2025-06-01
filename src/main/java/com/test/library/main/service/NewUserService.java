@@ -36,7 +36,6 @@ public class NewUserService {
             return new NewUserEncryptedDto(
                     origin.email(),
                     origin.fullName(),
-                    origin.userRole(),
                     password);
         } catch (Exception e) {
             BadPasswordException exception = new BadPasswordException();
