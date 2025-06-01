@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: main-library-service
+  jpa:
+    properties:
+      hibernate:
+        default_schema: testlibrary
+        format_sql: ${SHOW_SQL_QUERIES:false}
+    show-sql: ${SHOW_SQL_QUERIES:false}
+app:
+  checkout:
+    default-return-days: 7
+  user-session-ttl-seconds: 10800
+  new-user-ttl-seconds: 3600
+  keep-session-alive-hours: 6
