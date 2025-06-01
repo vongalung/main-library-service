@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: main-library-service
+  jpa:
+    properties:
+      hibernate:
+        default_schema: testlibrary
+        format_sql: ${SHOW_SQL_QUERIES:false}
+    show-sql: ${SHOW_SQL_QUERIES:false}
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_REQUIRE_AUTH:true}
+          starttls:
+            enable: ${MAIL_ENABLE_TLS:true}
+app:
+  checkout:
+    default-return-days: 7
+  user-session-ttl-seconds: 10800
+  new-user-ttl-seconds: 3600
+  keep-session-alive-hours: 6
+  application-base-url: ${BASE_URL}
+  redis:
+    connections:
+      - host: ${REDIS_URL:localhost}
+        port: ${REDIS_PORT:6379}
+    timeout: 60
+    auth:
+      password: ${REDIS_PASS:false}
