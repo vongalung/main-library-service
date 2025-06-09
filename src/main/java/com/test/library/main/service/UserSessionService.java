@@ -1,5 +1,6 @@
 package com.test.library.main.service;
 
+import static com.test.library.main.common.VerifyingUtils.verifyAsAdmin;
 import static java.time.Duration.ofHours;
 import static java.time.Duration.ofSeconds;
 
@@ -102,5 +103,9 @@ public class UserSessionService {
             throw new UserSessionExpiresException();
         }
         return session.getUser();
+    }
+
+    public void verifyUserAsAdmin() throws BaseApplicationException {
+        verifyAsAdmin(findUserFromSession());
     }
 }

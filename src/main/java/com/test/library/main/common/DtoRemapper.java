@@ -1,15 +1,22 @@
 package com.test.library.main.common;
 
-import com.test.library.main.dto.response.BookDto;
-import com.test.library.main.dto.response.CheckOutBookDto;
-import com.test.library.main.dto.response.CheckOutUserDto;
-import com.test.library.main.dto.response.UserDto;
+import com.test.library.main.dto.response.*;
 import com.test.library.main.model.*;
 import java.time.ZonedDateTime;
 import java.util.List;
 
 public class DtoRemapper {
-    public static BookDto remapBook(Book book) {
+    public static ReturnStatusDto remapReturnStatus(ReturnStatus status) {
+        if (status == null) {
+            return null;
+        }
+        return new ReturnStatusDto(
+                status.getId(),
+                status.getStatus(),
+                status.getDescription());
+    }
+
+    public static BookDetailDto remapBookDetail(Book book) {
         if (book == null) {
             return null;
         }
@@ -20,11 +27,40 @@ public class DtoRemapper {
         }
 
         MasterBook master = book.getMasterBook();
-        return new BookDto(
+        return new BookDetailDto(
                 book.getId(),
                 master.getTitle(),
                 master.getAuthor(),
                 master.getSynopsis(),
+                book.getIsAvailable(),
+                history == null ? null : history.getCheckOutDate(),
+                history == null ? null : history.getExpectedReturnDate(),
+                history == null ? null : remapCheckOutUser(history.getUser()));
+    }
+
+    public static BookMasterDto remapBookMaster(MasterBook book) {
+        if (book == null) {
+            return null;
+        }
+        return new BookMasterDto(
+                book.getId(),
+                book.getTitle(),
+                book.getAuthor(),
+                book.getSynopsis(),
+                book.getBooks().size());
+    }
+
+    public static BookUnitDto remapBookUnit(Book book) {
+        if (book == null) {
+            return null;
+        }
+        CheckOutHistory history = null;
+        List<CheckOutHistory> histories = book.getCheckOutHistories();
+        if (histories != null && !histories.isEmpty()) {
+            history = histories.getFirst();
+        }
+        return new BookUnitDto(
+                book.getId(),
                 book.getIsAvailable(),
                 history == null ? null : history.getCheckOutDate(),
                 history == null ? null : history.getExpectedReturnDate(),
