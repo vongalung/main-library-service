@@ -7,5 +7,5 @@ public record BookMasterDto(
     String title,
     String author,
     String synopsis,
-    Integer availableUnits
+    Long availableUnits
 ) { }

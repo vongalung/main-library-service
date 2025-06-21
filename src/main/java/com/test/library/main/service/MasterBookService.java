@@ -4,6 +4,7 @@ import com.test.library.main.common.PaginationFactory;
 import com.test.library.main.dto.request.BookSearchRequestDto;
 import com.test.library.main.dto.request.NewBookDto;
 import com.test.library.main.model.MasterBook;
+import com.test.library.main.model.MasterBookWithCountedUnits;
 import com.test.library.main.repository.MasterBookRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ public class MasterBookService {
     }
 
     @Transactional
-    public PaginationFactory<MasterBook> findAll(BookSearchRequestDto request) {
+    public PaginationFactory<MasterBookWithCountedUnits> findAll(BookSearchRequestDto request) {
         return masterBookRepo.findAllWithParameters(request);
     }
 

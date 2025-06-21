@@ -47,7 +47,19 @@ public class DtoRemapper {
                 book.getTitle(),
                 book.getAuthor(),
                 book.getSynopsis(),
-                book.getBooks().size());
+                (long) book.getBooks().size());
+    }
+
+    public static BookMasterDto remapBookMaster(MasterBookWithCountedUnits book) {
+        if (book == null) {
+            return null;
+        }
+        return new BookMasterDto(
+                book.getId(),
+                book.getTitle(),
+                book.getAuthor(),
+                book.getSynopsis(),
+                book.getAvailableUnits());
     }
 
     public static BookUnitDto remapBookUnit(Book book) {

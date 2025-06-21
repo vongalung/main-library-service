@@ -11,6 +11,7 @@ import com.test.library.main.exception.BaseApplicationException;
 import com.test.library.main.exception.TitleNotFoundException;
 import com.test.library.main.model.Book;
 import com.test.library.main.model.MasterBook;
+import com.test.library.main.model.MasterBookWithCountedUnits;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,8 +28,8 @@ public class BookMasterControllerService {
 
     @Transactional
     public Page<BookMasterDto> findAll(BookSearchRequestDto request) {
-        PaginationFactory<MasterBook> paginationFactory = masterBookService.findAll(request);
-        try (Stream<MasterBook> stream = paginationFactory.stream()) {
+        PaginationFactory<MasterBookWithCountedUnits> paginationFactory = masterBookService.findAll(request);
+        try (Stream<MasterBookWithCountedUnits> stream = paginationFactory.stream()) {
             return paginationFactory.replacePagination(stream.map(DtoRemapper::remapBookMaster))
                     .finalizePage();
         }

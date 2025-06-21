@@ -9,6 +9,7 @@ import com.test.library.main.dto.request.BookSearchRequestDto;
 import com.test.library.main.model.Book;
 import com.test.library.main.model.CheckOutHistory;
 import com.test.library.main.model.MasterBook;
+import com.test.library.main.model.MasterBookWithCountedUnits;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -76,36 +77,46 @@ public class MasterBookRepoExtensionImpl implements MasterBookRepoExtension {
     }
 
     @Override
-    public PaginationFactory<MasterBook> findAllWithParameters(BookSearchRequestDto parameters) {
+    public PaginationFactory<MasterBookWithCountedUnits> findAllWithParameters(BookSearchRequestDto parameters) {
         Session session = entityManager.unwrap(Session.class);
         session.enableFilter("Book_unreturnedCheckOuts");
 
         CriteriaBuilder cb = session.getCriteriaBuilder();
-        CriteriaQuery<MasterBook> query = cb.createQuery(MasterBook.class);
+        CriteriaQuery<MasterBookWithCountedUnits> query = cb.createQuery(MasterBookWithCountedUnits.class);
         Root<MasterBook> root = query.from(MasterBook.class);
+        Join<MasterBook, Book> bookJoin = root.join("books", LEFT);
 
-        query = query.select(root)
-                .where(createWherePredicate(cb, root, parameters))
+        query = query.multiselect(
+                        root.get("id"),
+                        root.get("createdDate"),
+                        root.get("title"),
+                        root.get("author"),
+                        root.get("synopsis"),
+                        cb.count(bookJoin))
+                .where(createWherePredicate(cb, root, bookJoin, parameters))
+                .groupBy(root)
                 .orderBy(createOrdering(cb, root));
-        TypedQuery<MasterBook> fetched = entityManager.createQuery(query);
+        TypedQuery<MasterBookWithCountedUnits> fetched = entityManager.createQuery(query);
 
         Integer page = parameters.getPage();
         Integer limit = parameters.getPagesize();
         if (page != null && limit != null) {
             Long count = repoExtensionHelper.countTotal(MasterBook.class, cb,
-                    (c, countRoot) -> createWherePredicate(c, countRoot, parameters));
+                    (c, countRoot) -> createWherePredicate(
+                            c, countRoot, bookJoin, parameters));
             Pageable pageable = PageRequest.of(page, limit);
-            Stream<MasterBook> stream = fetched
+            Stream<MasterBookWithCountedUnits> stream = fetched
                     .setFirstResult((int) pageable.getOffset())
                     .setMaxResults(pageable.getPageSize())
                     .getResultStream();
             return new PaginationFactory<>(pageable, count, stream);
         }
-        Stream<MasterBook> stream = fetched.getResultStream();
+        Stream<MasterBookWithCountedUnits> stream = fetched.getResultStream();
         return new PaginationFactory<>(null, null, stream);
     }
 
     Predicate createWherePredicate(CriteriaBuilder cb, Root<MasterBook> root,
+                                   Join<MasterBook, Book> bookJoin,
                                    BookSearchRequestDto parameters) {
         List<Predicate> predicates = new ArrayList<>();
 
@@ -114,7 +125,7 @@ public class MasterBookRepoExtensionImpl implements MasterBookRepoExtension {
         if ((title != null && !title.isBlank()) || (author != null && !author.isBlank())) {
             predicates.addAll(createMasterBookPredicates(cb, root, title, author));
         }
-        predicates.addAll(createCheckOutHistoryPredicates(cb, root, parameters));
+        predicates.addAll(createCheckOutHistoryPredicates(cb, bookJoin, parameters));
 
         return cb.and(predicates.toArray(new Predicate[0]));
     }
@@ -140,10 +151,9 @@ public class MasterBookRepoExtensionImpl implements MasterBookRepoExtension {
         return cb.like(cb.upper(root.get("author")), likePattern(author.toUpperCase()));
     }
 
-    List<Predicate> createCheckOutHistoryPredicates(CriteriaBuilder cb, Root<MasterBook> root,
+    List<Predicate> createCheckOutHistoryPredicates(CriteriaBuilder cb, Join<MasterBook, Book> bookJoin,
                                                     BookSearchRequestDto parameters) {
         List<Predicate> predicates = new ArrayList<>();
-        Join<MasterBook, Book> bookJoin = root.join("books", LEFT);
         Join<Book, CheckOutHistory> historyJoin = bookJoin
                 .join("checkOutHistories", LEFT);
 

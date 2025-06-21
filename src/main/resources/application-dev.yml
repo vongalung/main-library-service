@@ -3,6 +3,10 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
     defer-datasource-initialization: true
   datasource:
     hikari:
