@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.time.ZonedDateTime;
@@ -35,6 +36,12 @@ public class GlobalExceptionHandler {
         return handleBaseApplicationException(req, ex, BAD_REQUEST);
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, Object>> methodArgumentNotValid(HttpServletRequest req,
+                                                                      MissingServletRequestParameterException ex) {
+        return handleBaseApplicationException(req, ex, BAD_REQUEST);
+    }
+
     ResponseEntity<Map<String, Object>> handleBaseApplicationException(HttpServletRequest req,
                                                                        Exception ex, HttpStatus status) {
         String message = generateExceptionMessage(ex);
@@ -50,6 +57,9 @@ public class GlobalExceptionHandler {
     String generateExceptionMessage(Exception ex) {
         if (ex instanceof BaseApplicationException) {
             return generateExceptionMessage((BaseApplicationException) ex);
+        }
+        if (ex instanceof MissingServletRequestParameterException) {
+            return generateExceptionMessage((MissingServletRequestParameterException) ex);
         }
         if (ex instanceof MethodArgumentNotValidException) {
             return generateExceptionMessage((MethodArgumentNotValidException) ex);
@@ -78,5 +88,9 @@ public class GlobalExceptionHandler {
             return exceptionType;
         }
         return exceptionType + ": " + message;
+    }
+
+    String generateExceptionMessage(MissingServletRequestParameterException ex) {
+        return "Request parameter `" + ex.getParameterName() + "` is required.";
     }
 }

@@ -1,9 +1,9 @@
 package com.test.library.main.dto.request;
 
-import com.test.library.main.model.ReturnStatus;
 import jakarta.validation.constraints.NotNull;
+import java.util.UUID;
 
 public record ReturnCheckOutDto(
-    @NotNull ReturnStatus returnStatus,
+    @NotNull UUID returnStatusId,
     String remarks
 ) { }

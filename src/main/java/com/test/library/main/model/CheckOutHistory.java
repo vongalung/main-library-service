@@ -1,6 +1,5 @@
 package com.test.library.main.model;
 
-import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.AUTO;
 
 import jakarta.persistence.*;
@@ -24,9 +23,12 @@ public class CheckOutHistory {
     private ZonedDateTime checkOutDate;
     @NotNull
     private ZonedDateTime expectedReturnDate;
-    private ZonedDateTime returnDate;
-    @Enumerated(STRING)
+
+    @ManyToOne
+    @JoinColumn(name = "return_status_id")
+    @Valid
     private ReturnStatus returnStatus;
+    private ZonedDateTime returnDate;
     private String remarks;
 
     @ManyToOne

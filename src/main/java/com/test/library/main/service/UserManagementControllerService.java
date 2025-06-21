@@ -2,7 +2,6 @@ package com.test.library.main.service;
 
 import static com.test.library.main.common.DtoRemapper.remapUser;
 import static com.test.library.main.common.EncryptionUtils.verifyEncryptedMatches;
-import static com.test.library.main.common.VerifyingUtils.verifyAsAdmin;
 
 import com.test.library.main.dto.request.LoginRequestDto;
 import com.test.library.main.dto.request.NewUserDto;
@@ -33,7 +32,7 @@ public class UserManagementControllerService {
     }
 
     public UserDto findUser(UUID userId) throws BaseApplicationException {
-        verifyAsAdmin(userSessionService.findUserFromSession());
+        userSessionService.verifyUserAsAdmin();
         return getUserDetails(userId);
     }
 
