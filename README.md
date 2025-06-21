@@ -1,7 +1,7 @@
 main-library-service
 ====
 
-*by Arthur Hutagalung*
+*by Uncleqrow*
 
 # Setup
 
@@ -113,6 +113,24 @@ curl --location '{{BASE_URL}}/book?page={{PAGINATION_NUMBER}}&pagesize={{PAGINAT
 --header 'sessionId: {{USER_LOGIN_SESSION_ID}}'
 ```
 
+Response:
+
+```json
+{
+  "content": [
+    {
+      "id": {{TITLE_ID}},
+      "title": {{TITLE}},
+      "author": {{AUTHOR}},
+      "synopsis": {{SYNOPSIS}},
+      "availableUnits": {{NUMBER_OF_AVAILABLE_UNITS}}
+    },
+    ....
+  ],
+  .... // pagination info
+}
+```
+
 Possible search filters:
 
 - `title`: substring search on the book title
@@ -127,12 +145,45 @@ Possible search filters:
 - `page`: page number (for pagination)
 - `pagesize`: number of max items each page (for pagination)
 
-### Book Details per Item
+### List Available Items per Title
+
+Use `{{TITLE_ID}}` obtained from [Book Searching](#book-searching) section above.
 
 Request:
 
 ```shell
-curl --location '{{BASE_URL}}/book/{{BOOK_ID}}' \
+curl --location '{{BASE_URL}}/book/{{TITLE_ID}}' \
+--header 'sessionId: {{USER_LOGIN_SESSION_ID}}'
+```
+
+Response:
+
+```json
+{
+  "content": [
+    {
+      "id": {{ITEM_ID}},
+      "isAvailable": {{TRUE/FALSE}},
+      "lastUnreturnedCheckoutAt": {{TIMESTAMP}},
+      "expectedReturnDate": {{TIMESTAMP}},
+      "currentBorrower": {
+        // Info on current borrower
+      }
+    },
+    ....
+  ],
+  .... // pagination info
+}
+```
+
+### Book Details per Item
+
+Use `{{ITEM_ID}}` obtained from [List Available Items per Title](#list-available-items-per-title) section above.
+
+Request:
+
+```shell
+curl --location '{{BASE_URL}}/book/checkout/{{ITEM_ID}}' \
 --header 'sessionId: {{USER_LOGIN_SESSION_ID}}'
 ```
 
@@ -141,7 +192,7 @@ curl --location '{{BASE_URL}}/book/{{BOOK_ID}}' \
 Request:
 
 ```shell
-curl --location --request POST '{{BASE_URL}}/book/{{BOOK_ID}}/checkout/self' \
+curl --location --request POST '{{BASE_URL}}/book/checkout/{{ITEM_ID}}/self' \
 --header 'sessionId: {{USER_LOGIN_SESSION_ID}}'
 ```
 
@@ -152,18 +203,16 @@ Response includes info on `expectedReturnDate`.
 Request:
 
 ```shell
-curl --location '{{BASE_URL}}/book/{{BOOK_ID}}/return' \
+curl --location '{{BASE_URL}}/book/checkout/{{ITEM_ID}}/return' \
 --header 'sessionId: {{USER_LOGIN_SESSION_ID}}' \
 --header 'Content-Type: application/json' \
 --data '{
-    "returnStatus": {{RETURN_STATUS}},
-    "remarks": {{OPTIONAL_REMARKS}}
+    "returnStatus": {{RETURN_STATUS_ID}},
+    "remarks": {{OPTIONAL_REMARKS}} // optional
 }'
 ```
 
-`"remarks"` is optional.
-
-For possible return status values see section below.
+For possible `{{RETURN_STATUS_ID}}` see [Return Status](#return-status) section below.
 
 ### Return Status
 
@@ -173,12 +222,77 @@ Request:
 curl --location '{{BASE_URL}}/master/returnStatus'
 ```
 
-As of the writing of this, the possible return statuses are:
+Response:
 
-- `RETURNED`: Book is returned without issue.
-- `RETURNED_WITH_DELAY`: Book is returned with noticeable delay. 
-- `SLIGHT_RUINED`: Book is returned in bad condition, but still fixable.
-- `RUINED`: Book is returned in bad condition. Replacement should be demanded.
-- `MISSING`: Book is not returned/missing, but the user reports back. Replacement should be demanded.
-- `USER_AWOL`: Book is not returned/missing, and the user failed to report back. 
-- `OTHERS`: Other situation not covered above. `remarks` should be expected.
+```json
+[
+  {
+    "id": {{RETURN_STATUS_ID}},
+    "status": {{STATUS_NAME}},
+    "description": {{DESCRIPTION}}
+  },
+  ....
+]
+```
+
+## Administration Features
+
+These features below can only be accessed with users of `ADMIN` role.
+
+### Adding New Titles
+
+Request:
+
+```shell
+curl --location '{{BASE_URL}}/book' \
+--header 'sessionId: {{USER_LOGIN_SESSION_ID}}' \
+--header 'Content-Type: application/json' \
+--data '{
+    "title": {{TITLE}},
+    "author": {{AUTHOR}},
+    "synopsis": {{SYNOPSIS}}
+}'
+```
+
+Response:
+
+```json
+{
+  "id": {{TITLE_ID}},
+  "title": {{TITLE}},
+  "author": {{AUTHOR}},
+  "synopsis": {{SYNOPSIS}},
+  "availableUnits": {{NUMBER_OF_AVAILABLE_UNITS}}
+}
+```
+
+### Adding New Item for a Title
+
+Use `{{TITLE_ID}}` received from after [search result](#book-searching) or [adding new title](#adding-new-titles).
+
+Request:
+
+```shell
+curl --location --request PUT '{{BASE_URL}}/book/{{TITLE_ID}}' \
+--header 'sessionId: {{USER_LOGIN_SESSION_ID}}'
+```
+
+## Misc. Features
+
+### Listing Unique Titles of Available Books
+
+Request:
+
+```shell
+curl --location '{{BASE_URL}}/master/titles?titles={{TITLE_SUBSTRING}}' \
+--header 'sessionId: {{USER_LOGIN_SESSION_ID}}'
+```
+
+### Listing Unique Authors of Available Books
+
+Request:
+
+```shell
+curl --location '{{BASE_URL}}/master/author?author={{AUTHOR_NAME_SUBSTRING}}' \
+--header 'sessionId: {{USER_LOGIN_SESSION_ID}}'
+```
