@@ -1,6 +1,5 @@
 package com.test.library.main.model;
 
-import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.AUTO;
 
@@ -25,7 +24,7 @@ public class UserSession {
     private ZonedDateTime createdDate;
     private ZonedDateTime expiresAt;
 
-    @OneToOne(fetch = LAZY, cascade = ALL)
+    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     @NotNull
     @Valid

@@ -20,7 +20,7 @@ import java.util.UUID;
 @Entity
 @FilterDef(name = "User_unreturnedCheckOuts")
 @Data
-public class User implements UserBase {
+public class User {
     @Id
     @GeneratedValue(strategy = AUTO)
     @Column(columnDefinition = "uuid", updatable = false, nullable = false)
@@ -36,7 +36,7 @@ public class User implements UserBase {
     @NotNull
     private byte[] encryptedPassword;
 
-    @OneToOne(fetch = LAZY, cascade = ALL)
+    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "master_person_id")
     @NotNull
     @Valid

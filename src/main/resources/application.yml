@@ -21,3 +21,6 @@ app:
   user-session-ttl-seconds: 10800
   new-user-ttl-seconds: 3600
   keep-session-alive-hours: 6
+logging:
+  pattern:
+    console: "%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr([requestId=%X{requestId} sessionId=%X{sessionId}]) %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"

@@ -1,6 +1,5 @@
 package com.test.library.main.config;
 
-import com.test.library.main.exception.InvalidUserSessionException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.ToString;
@@ -18,7 +17,8 @@ public class SessionData {
     SessionData(HttpServletRequest request) {
         String rawSessionId = request.getHeader("sessionId");
         if (rawSessionId == null || rawSessionId.isBlank()) {
-            throw new InvalidUserSessionException();
+            userSession = null;
+            return;
         }
         userSession = UUID.fromString(rawSessionId);
     }
