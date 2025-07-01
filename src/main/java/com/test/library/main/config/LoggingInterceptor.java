@@ -1,7 +1,7 @@
 package com.test.library.main.config;
 
-import static org.apache.logging.log4j.ThreadContext.clearAll;
-import static org.apache.logging.log4j.ThreadContext.put;
+import static org.slf4j.MDC.clear;
+import static org.slf4j.MDC.put;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,6 +34,6 @@ public class LoggingInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
-        clearAll();
+        clear();
     }
 }
